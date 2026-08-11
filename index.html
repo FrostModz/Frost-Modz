@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Activación</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .subtitle {
+      color: #aaa;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    input {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      text-align: center;
+      margin-bottom: 20px;
+      outline: none;
+    }
+    input::placeholder { color: #666; }
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: #00c853;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 10px;
+    }
+    button:active { transform: scale(0.97); }
+    #msg {
+      margin-top: 20px;
+      font-size: 15px;
+      min-height: 24px;
+    }
+    .success { color: #00e676; }
+    .error { color: #ff5252; }
+    #okBtn {
+      display: none;
+      background: #2979ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Activación requerida</h1>
+    <p class="subtitle">Ingresa tu key para continuar</p>
+    
+    <input type="text" id="keyInput" placeholder="Escribe tu key" autocomplete="off" autocapitalize="off">
+    <button id="activarBtn" onclick="verificar()">Activar</button>
+    
+    <p id="msg"></p>
+    <button id="okBtn" onclick="cerrar()">Ok</button>
+  </div>
+
+  <script>
+    const KEY_CORRECTA = "Janxell-Xit-Developer";
+    const DURACION_MS = 24 * 60 * 60 * 1000; // 1 día
+
+    function verificar() {
+      const key = document.getElementById("keyInput").value.trim();
+      const msg = document.getElementById("msg");
+      const okBtn = document.getElementById("okBtn");
+      const activarBtn = document.getElementById("activarBtn");
+      const input = document.getElementById("keyInput");
+
+      if (key !== KEY_CORRECTA) {
+        msg.className = "error";
+        msg.innerText = "Key incorrecta";
+        return;
+      }
+
+      // Guardar activación
+      localStorage.setItem("activado_en", Date.now());
+
+      msg.className = "success";
+      msg.innerText = "Key activada por 1 día";
+      
+      // Ocultar input y botón Activar, mostrar Ok
+      input.style.display = "none";
+      activarBtn.style.display = "none";
+      okBtn.style.display = "block";
+    }
+
+    function cerrar() {
+      // Intenta cerrar el WebView
+      // Esto solo funciona si en el APK se configuró JavascriptInterface
+      try {
+        if (window.Android && Android.closeWebView) {
+          Android.closeWebView();
+        } else {
+          // Fallback: intenta cerrar de otras formas
+          window.close();
+        }
+      } catch (e) {
+        window.close();
+      }
+    }
+
+    // Al cargar, comprobar si ya está activado
+    window.onload = function() {
+      const activadoEn = localStorage.getItem("activado_en");
+      const msg = document.getElementById("msg");
+      const okBtn = document.getElementById("okBtn");
+      const activarBtn = document.getElementById("activarBtn");
+      const input = document.getElementById("keyInput");
+
+      if (activadoEn) {
+        const tiempoPasado = Date.now() - parseInt(activadoEn);
+        
+        if (tiempoPasado < DURACION_MS) {
+          msg.className = "success";
+          msg.innerText = "Key activada por 1 día";
+          input.style.display = "none";
+          activarBtn.style.display = "none";
+          okBtn.style.display = "block";
+        } else {
+          localStorage.removeItem("activado_en");
+        }
+      }
+    };
+
+    document.getElementById("keyInput").addEventListener("keyup", function(e) {
+      if (e.key === "Enter") verificar();
+    });
+  </script>
+</body>
+  </html>
