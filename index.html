@@ -6,136 +6,147 @@
 <title>Frost Modz - Activación</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+    * {
+        box-sizing: border-box;
+    }
 
-body {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #07111f;
-    color: white;
-    font-family: Arial, sans-serif;
-}
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+        background: #07111f;
+        color: white;
+    }
 
-.card {
-    width: 90%;
-    max-width: 380px;
-    padding: 30px 24px;
-    text-align: center;
-    background: #0d1b2e;
-    border: 1px solid #2388ff;
-    border-radius: 18px;
-    box-shadow: 0 0 30px rgba(35,136,255,.25);
-}
+    .box {
+        width: 90%;
+        max-width: 380px;
+        padding: 28px;
+        text-align: center;
+        border: 1px solid #2196f3;
+        border-radius: 18px;
+        background: #0d1b2a;
+        box-shadow: 0 0 25px rgba(33,150,243,.25);
+    }
 
-.icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-}
+    h1 {
+        margin-top: 0;
+        color: #42a5f5;
+    }
 
-h1 {
-    font-size: 25px;
-    margin-bottom: 10px;
-}
+    p {
+        color: #cfd8dc;
+        line-height: 1.5;
+    }
 
-.message {
-    color: #aebbd0;
-    line-height: 1.5;
-    margin-bottom: 22px;
-}
+    input {
+        width: 100%;
+        padding: 14px;
+        margin: 15px 0;
+        border: 1px solid #2196f3;
+        border-radius: 10px;
+        outline: none;
+        background: #07111f;
+        color: white;
+        font-size: 15px;
+        text-align: center;
+    }
 
-input {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #315477;
-    border-radius: 10px;
-    outline: none;
-    background: #081525;
-    color: white;
-    text-align: center;
-    font-size: 15px;
-    margin-bottom: 14px;
-}
+    button {
+        width: 100%;
+        padding: 14px;
+        border: 0;
+        border-radius: 10px;
+        background: #2196f3;
+        color: white;
+        font-weight: bold;
+        font-size: 15px;
+        cursor: pointer;
+    }
 
-button {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    background: #2388ff;
-    color: white;
-    font-weight: bold;
-    font-size: 15px;
-}
+    #result {
+        margin-top: 18px;
+        font-weight: bold;
+    }
 
-#result {
-    margin-top: 16px;
-    min-height: 20px;
-    font-size: 14px;
-}
+    .success {
+        color: #00e676;
+    }
 
-.success {
-    color: #4dff91;
-}
-
-.error {
-    color: #ff5d6c;
-}
-
-.credit {
-    margin-top: 22px;
-    color: #647995;
-    font-size: 12px;
-}
+    .error {
+        color: #ff5252;
+    }
 </style>
 </head>
 
 <body>
 
-<div class="card">
-    <div class="icon">🔑</div>
+<div class="box">
+    <h1>❄️ Frost Modz</h1>
 
-    <h1>Activación Requerida</h1>
-
-    <p class="message">
-        Ingresa tu key para continuar usando la aplicación.
+    <p>
+        🔑 Activación requerida<br>
+        Introduce tu key para continuar.
     </p>
 
-    <input id="keyInput" type="text" placeholder="Ingresa tu key">
+    <input
+        id="key"
+        type="text"
+        placeholder="Introduce tu key"
+        autocomplete="off"
+    >
 
     <button onclick="activateKey()">ACTIVAR KEY</button>
 
     <div id="result"></div>
-
-    <div class="credit">Frost Modz</div>
 </div>
 
 <script>
-const correctKey = "Frost-24-hours";
-const durationHours = 24;
+const CORRECT_KEY = "Frost-24-hours";
 
 function activateKey() {
-    const key = document.getElementById("keyInput").value.trim();
+    const input = document.getElementById("key").value.trim();
     const result = document.getElementById("result");
 
-    if (key === correctKey) {
-        const expires = Date.now() + durationHours * 60 * 60 * 1000;
-
-        localStorage.setItem("frost_key", key);
-        localStorage.setItem("frost_expiration", expires);
-
+    if (input === CORRECT_KEY) {
         result.className = "success";
-        result.textContent = "✓ Key activada por 24 horas";
+        result.textContent = "✅ Key correcta — activada por 24 horas.";
+
+        localStorage.setItem("frost_key", CORRECT_KEY);
+        localStorage.setItem(
+            "frost_expiration",
+            Date.now() + (24 * 60 * 60 * 1000)
+        );
+
+        // Aquí puedes cambiar la página que se muestra después de activar.
+        setTimeout(() => {
+            document.body.innerHTML = `
+                <div class="box">
+                    <h1>✅ Activado</h1>
+                    <p>Tu acceso Frost Modz está activo durante 24 horas.</p>
+                </div>
+            `;
+        }, 800);
+
     } else {
         result.className = "error";
-        result.textContent = "✕ Key incorrecta";
+        result.textContent = "❌ Key incorrecta";
     }
 }
+
+window.onload = function() {
+    const savedKey = localStorage.getItem("frost_key");
+    const expiration = Number(localStorage.getItem("frost_expiration"));
+
+    if (savedKey === CORRECT_KEY && Date.now() < expiration) {
+        document.getElementById("result").className = "success";
+        document.getElementById("result").textContent =
+            "✅ Tu key todavía está activa.";
+    }
+};
 </script>
 
 </body>
